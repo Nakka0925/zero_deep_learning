@@ -1,1 +1,2 @@
-# zero_deep_learning
+。
+Nakanishi Daiki & Mizuno Yasuak1  
