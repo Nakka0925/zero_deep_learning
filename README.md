@@ -1,2 +1,2 @@
 。
-Nakanishi Daiki & Mizuno Yasuak1  
+Nakanishi Daiki & Mizuno Yasuak1  co-development
