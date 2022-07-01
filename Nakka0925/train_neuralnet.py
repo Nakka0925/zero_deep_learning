@@ -31,11 +31,7 @@ t_test = np.array(t_test)
 
 network = TwoLayerNet(input_size=36864, hidden_size=50, output_size=3)
 
-#iters_num = 10000
-train_size = x_train.shape[0]
-#batch_size = 100
-epoch = 5
-iters_num = epoch * x_train.shape[0]
+epoch = 20
 
 learning_rate = 0.1
 
@@ -43,35 +39,32 @@ train_loss_list = []
 train_acc_list = []
 test_acc_list = []
 
-x_batch = x_train#[batch_mask]
-t_batch = t_train#[batch_mask]
-
 #iter_per_epoch = int(max(train_size / batch_size, 1))
-#print(iter_per_epoch)
+
 start = time.time()
-for i in range(1, iters_num + 1):
+for i in range(epoch):
     #batch_mask = np.random.choice(train_size, batch_size)
     
     # 勾配
     #grad = network.numerical_gradient(x_batch, t_batch)
-    grad = network.gradient(x_batch, t_batch)
+    grad = network.gradient(x_train, t_train)
     
     # 更新
     for key in ('W1', 'b1', 'W2', 'b2'):
         network.params[key] -= learning_rate * grad[key]
     
 
-    if i % iters_num == 0:
-        train_acc = network.accuracy(x_train, t_train)
-        test_acc = network.accuracy(x_test, t_test)
-        loss = network.loss(x_batch, t_batch)
-        train_loss_list.append(loss)
-        train_acc_list.append(train_acc)
-        test_acc_list.append(test_acc)
-        print("train_accuracy:", train_acc, "test_accuracy:", test_acc)
-        end = time.time()
-        print("epoch" + str(int(i / iters_num)), str(end - start) + 's')
-        start = time.time()
+    #if i % train_size == 0:
+    train_acc = network.accuracy(x_train, t_train)
+    test_acc = network.accuracy(x_test, t_test)
+    loss = network.loss(x_train, t_train)
+    train_loss_list.append(loss)
+    train_acc_list.append(train_acc)
+    test_acc_list.append(test_acc)
+    print("train_accuracy:", train_acc, "test_accuracy:", test_acc)
+    end = time.time()
+    print("epoch" + str(int(i+1)), str(end - start) + 's')
+    start = time.time()
     
 
 # グラフの描画
