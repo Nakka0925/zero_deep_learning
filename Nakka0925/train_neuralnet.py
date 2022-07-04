@@ -1,4 +1,5 @@
 # coding: utf-8
+from cgi import test
 import sys, os
 import time
 from cv2 import THRESH_TRIANGLE
@@ -10,6 +11,7 @@ from datasets import data_gain
 import matplotlib.pyplot as plt
 #from mnist import load_mnist
 from two_layer_net import TwoLayerNet
+from common.optimizer import SGD, Adam
 
 # データの読み込み
 #(x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label=True)
@@ -17,7 +19,9 @@ file_list, label_list = data_gain()
 
 file_list = np.array(file_list)
 label_list = np.array(label_list)
-#print(file_list.shape)
+file_list = file_list.reshape(7550, 36864)
+
+print(file_list.shape)
 
 #0.0 ~ 1.0 に正規化
 file_list = [file.astype(float)/255.0 for file in file_list]
@@ -29,11 +33,14 @@ t_train = np.array(t_train)
 x_test = np.array(x_test)
 t_test = np.array(t_test)
 
-network = TwoLayerNet(input_size=36864, hidden_size=50, output_size=3)
+print(t_train[:30])
 
-epoch = 20
 
-learning_rate = 0.1
+network = TwoLayerNet(input_size=36864, hidden_size=100, output_size=3)
+
+epoch = 30
+
+learning_rate = 0.01
 
 train_loss_list = []
 train_acc_list = []
@@ -49,10 +56,15 @@ for i in range(epoch):
     #grad = network.numerical_gradient(x_batch, t_batch)
     grad = network.gradient(x_train, t_train)
     
-    # 更新
-    for key in ('W1', 'b1', 'W2', 'b2'):
+    """
+     更新
+    #for key in ('W1', 'b1', 'W2', 'b2'):
         network.params[key] -= learning_rate * grad[key]
-    
+    """
+
+    test = Adam()
+
+    network.params = test.update(network.params, grad)
 
     #if i % train_size == 0:
     train_acc = network.accuracy(x_train, t_train)
@@ -76,7 +88,7 @@ plt.xlabel("epochs")
 plt.ylabel("accuracy")
 plt.ylim(0, 1.0)
 plt.legend(loc='lower right')
-plt.savefig("accuracy_nonbath.png")
+plt.savefig("accuracy_flat.png")
 
 plt.clf()
 
@@ -85,4 +97,4 @@ x = np.arange(len(train_loss_list))
 plt.plot(x, train_loss_list, label='train loss')
 plt.xlabel("epochs")
 plt.ylabel("loss")
-plt.savefig("loss_nonbach.png")
+plt.savefig("loss_flat.png")
