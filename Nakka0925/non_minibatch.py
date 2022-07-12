@@ -38,6 +38,7 @@ epoch = 30
 
 learning_rate = 0.01
 
+test_loss_list = []
 train_loss_list = []
 train_acc_list = []
 test_acc_list = []
@@ -52,23 +53,26 @@ for i in range(epoch):
     #grad = network.numerical_gradient(x_batch, t_batch)
     grad = network.gradient(x_train, t_train)
     
-    """
-     更新
-    #for key in ('W1', 'b1', 'W2', 'b2'):
+    
+    #更新
+    for key in ('W1', 'b1', 'W2', 'b2'):
         network.params[key] -= learning_rate * grad[key]
-    """
+    
 
-    test = Adam()
+    #test = Adam()
 
-    network.params = test.update(network.params, grad)
+    #network.params = test.update(network.params, grad)
 
     #if i % train_size == 0:
     train_acc = network.accuracy(x_train, t_train)
     test_acc = network.accuracy(x_test, t_test)
-    loss = network.loss(x_train, t_train)
-    train_loss_list.append(loss)
+    train_loss = network.loss(x_train, t_train)
+    test_loss = network.loss(x_test, t_test)
+    
     train_acc_list.append(train_acc)
     test_acc_list.append(test_acc)
+    train_loss_list.append(train_loss)
+    test_loss_list.append(test_loss)
     print("train_accuracy:", train_acc, "test_accuracy:", test_acc)
     end = time.time()
     print("epoch" + str(int(i+1)), str(end - start) + 's')
@@ -84,13 +88,14 @@ plt.xlabel("epochs")
 plt.ylabel("accuracy")
 plt.ylim(0, 1.0)
 plt.legend(loc='lower right')
-plt.savefig("accuracy_flat.png")
+plt.savefig("accuracy_nonbatch.png")
 
 plt.clf()
 
-# 損失関数グラフ描画
-x = np.arange(len(train_loss_list))
-plt.plot(x, train_loss_list, label='train loss')
+x = np.arange(len(train_acc_list))
+plt.plot(x, train_loss_list, marker="o",label='train loss')
+plt.plot(x, test_loss_list, marker="o", label='test loss',)
 plt.xlabel("epochs")
 plt.ylabel("loss")
-plt.savefig("loss_flat.png")
+plt.legend(loc='upper right')
+plt.savefig("loss_nonbatch.png")

@@ -14,17 +14,14 @@ class TwoLayerNet:
         self.params = {}
         self.params['W1'] = weight_init_std * np.random.randn(input_size, hidden_size)
         self.params['b1'] = np.zeros(hidden_size)
-        self.params['W2'] = weight_init_std * np.random.randn(hidden_size, hidden_size)
-        self.params['b2'] = np.zeros(hidden_size)
-        self.params['W3'] = weight_init_std * np.random.randn(hidden_size, output_size)
-        self.params['b3'] = np.zeros(output_size)
+        self.params['W2'] = weight_init_std * np.random.randn(hidden_size, output_size)
+        self.params['b2'] = np.zeros(output_size)
         # レイヤの生成
         self.layers = OrderedDict()
         self.layers['Affine1'] = Affine(self.params['W1'], self.params['b1'])
         self.layers['Relu1'] = Relu()
         self.layers['Affine2'] = Affine(self.params['W2'], self.params['b2'])
-        self.layers['Relu2'] = Relu()
-        self.layers['Affine3'] = Affine(self.params['W3'], self.params['b3'])
+        
         self.lastLayer = SoftmaxWithLoss()
         
     def predict(self, x):
@@ -74,6 +71,6 @@ class TwoLayerNet:
         grads = {}
         grads['W1'], grads['b1'] = self.layers['Affine1'].dW, self.layers['Affine1'].db
         grads['W2'], grads['b2'] = self.layers['Affine2'].dW, self.layers['Affine2'].db
-        grads['W3'], grads['b3'] = self.layers['Affine3'].dW, self.layers['Affine3'].db
+
 
         return grads

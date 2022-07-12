@@ -36,12 +36,13 @@ batch_size = 100
 learning_rate = 0.01
 
 train_loss_list = []
+test_loss_list = []
 train_acc_list = []
 test_acc_list = []
 
 iter_per_epoch = int(max(train_size / batch_size, 1))
 
-epoch = 20
+epoch = 30
 
 iters_num = epoch * iter_per_epoch
 
@@ -55,7 +56,7 @@ for i in range(1, iters_num+1):
     grad = network.gradient(x_batch, t_batch)
     
     # 更新
-    for key in ('W1', 'b1', 'W2', 'b2', 'W3', 'b3'):
+    for key in ('W1', 'b1', 'W2', 'b2'):
         network.params[key] -= learning_rate * grad[key]
     
     """
@@ -67,12 +68,15 @@ for i in range(1, iters_num+1):
     if i % iter_per_epoch == 0:
         train_acc = network.accuracy(x_train, t_train)
         test_acc = network.accuracy(x_test, t_test)
-        loss = network.loss(x_batch, t_batch)
+        train_loss = network.loss(x_train, t_train)
+        test_loss = network.loss(x_test, t_test)
+
         train_acc_list.append(train_acc)
         test_acc_list.append(test_acc)
-        train_loss_list.append(loss)
+        train_loss_list.append(train_loss)
+        test_loss_list.append(test_loss)
+        
         print("train_accuracy:", train_acc, "test_accuracy:", test_acc)
-        print("loss", loss)
 
 
 # グラフの描画
@@ -90,7 +94,9 @@ plt.clf()
 
 # 損失関数グラフ描画
 x = np.arange(len(train_acc_list))
-plt.plot(x, train_loss_list, label='train loss')
+plt.plot(x, train_loss_list, marker="o",label='train loss')
+plt.plot(x, test_loss_list, marker="o", label='test loss',)
 plt.xlabel("epochs")
 plt.ylabel("loss")
+plt.legend(loc='upper right')
 plt.savefig("loss_batch.png")
