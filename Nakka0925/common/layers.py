@@ -1,4 +1,5 @@
 # coding: utf-8
+from re import I
 import numpy as np
 from common.functions import *
 from common.util import im2col, col2im
@@ -76,6 +77,8 @@ class SoftmaxWithLoss:
     def forward(self, x, t):
         self.t = t
         self.y = softmax(x)
+        #b = np.around(self.y[:5], decimals=5)
+        #print(b)
         self.loss = cross_entropy_error(self.y, self.t)
         
         return self.loss
