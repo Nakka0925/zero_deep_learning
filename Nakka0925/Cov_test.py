@@ -25,9 +25,9 @@ x_train = np.array(x_train)
 t_train = np.array(t_train)
 x_test = np.array(x_test)
 t_test = np.array(t_test)
-print(len(x_test))
+#print(len(x_test))
 
-max_epochs = 5
+max_epochs = 10
 
 network = SimpleConvNet(input_dim=(1,192,192), 
                         conv_param = {'filter_num': 8, 'filter_size': 3, 'pad': 0, 'stride': 1},
@@ -35,8 +35,8 @@ network = SimpleConvNet(input_dim=(1,192,192),
                         
 trainer = Trainer(network, x_train, t_train, x_test, t_test,
                   epochs=max_epochs, mini_batch_size=100,
-                  optimizer='Adam', optimizer_param={'lr': 0.001},
-                  evaluate_sample_num_per_epoch=len(x_test)
+                  optimizer='Adam', optimizer_param={'lr': 0.001}
+                  #evaluate_sample_num_per_epoch=len(x_test)
                   )
 trainer.train()
 
@@ -54,3 +54,13 @@ plt.ylabel("accuracy")
 plt.ylim(0, 1.0)
 plt.legend(loc='lower right')
 plt.savefig("acuracy_Cov_1510.png")
+
+plt.clf()
+
+plt.plot(x, trainer.train_loss_list, marker='o', label='train')
+plt.plot(x, trainer.test_loss_list, marker='o', label='test')
+plt.xlabel("epochs")
+plt.ylabel("loss")
+#plt.ylim(0, 2.0)
+plt.legend(loc='upper right')
+plt.savefig("loss_Cov_1510.png")

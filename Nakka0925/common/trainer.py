@@ -34,6 +34,7 @@ class Trainer:
         self.current_epoch = 0
         
         self.train_loss_list = []
+        self.test_loss_list = []
         self.train_acc_list = []
         self.test_acc_list = []
 
@@ -47,12 +48,10 @@ class Trainer:
         self.optimizer.update(self.network.params, grads)
         
         loss = self.network.loss(x_batch, t_batch)
-        self.train_loss_list.append(loss)
+        #self.train_loss_list.append(loss)
         if self.verbose: print("train loss:" + str(loss))
         
         if self.current_iter % self.iter_per_epoch == 0:
-            print(self.current_iter)
-            print(self.iter_per_epoch)
             self.current_epoch += 1
             
             x_train_sample, t_train_sample = self.x_train, self.t_train
@@ -61,11 +60,16 @@ class Trainer:
                 t = self.evaluate_sample_num_per_epoch
                 x_train_sample, t_train_sample = self.x_train[:t], self.t_train[:t]
                 x_test_sample, t_test_sample = self.x_test[:t], self.t_test[:t]
-                
+            
             train_acc = self.network.accuracy(x_train_sample, t_train_sample)
             test_acc = self.network.accuracy(x_test_sample, t_test_sample)
+            train_loss = self.network.loss(x_train_sample[:500], t_train_sample[:500])
+            test_loss = self.network.loss(x_test_sample[:500], t_test_sample[:500])
+
             self.train_acc_list.append(train_acc)
             self.test_acc_list.append(test_acc)
+            self.train_loss_list.append(train_loss)
+            self.test_loss_list.append(test_loss)
 
             if self.verbose:
                 #end = time.time()
@@ -74,7 +78,7 @@ class Trainer:
 
     def train(self):
         #start = time.time()
-        print(self.max_iter)
+        #print(self.max_iter)
         for i in range(self.max_iter):
             self.train_step()
 
