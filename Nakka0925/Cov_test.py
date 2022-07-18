@@ -14,29 +14,40 @@ file_list = np.array(file_list)
 label_list = np.array(label_list)
 file_list = file_list.reshape(7550, 1, 192, 192)
 
-#print(file_list.shape)
-
 #0.0 ~ 1.0 に正規化
 file_list = [file.astype(float)/255.0 for file in file_list]
 
-x_train, x_test, t_train, t_test = train_test_split(file_list, label_list, test_size=0.2)
+train_x, valid_x, train_y, valid_y = train_test_split(file_list, label_list, test_size=0.2)
 
-x_train = np.array(x_train)
-t_train = np.array(t_train)
-x_test = np.array(x_test)
-t_test = np.array(t_test)
-#print(len(x_test))
+train_y = np.array(train_y)
+valid_y = np.array(valid_y)
 
+train_x = np.array(train_x)
+valid_x = np.array(valid_x)
+
+
+"""
+x_val = valid_x[:755]
+y_val = valid_y[:755]
+
+test_x = valid_x[755:]
+test_y = valid_y[755:]
+"""
 max_epochs = 10
+
+# Dropuoutの有無、割り合いの設定 ========================
+use_dropout = True  # Dropoutなしのときの場合はFalseに
+dropout_ratio = 0.5
+# ====================================================
 
 network = SimpleConvNet(input_dim=(1,192,192), 
                         conv_param = {'filter_num': 8, 'filter_size': 3, 'pad': 0, 'stride': 1},
-                        hidden_size=100, output_size=3, weight_init_std=0.01)
+                        hidden_size=100, output_size=3, weight_init_std='Relu', use_dropout = use_dropout,
+                        dropout_ration = dropout_ratio)
                         
-trainer = Trainer(network, x_train, t_train, x_test, t_test,
-                  epochs=max_epochs, mini_batch_size=100,
+trainer = Trainer(network, train_x, train_y, valid_x, valid_y, 
+                  epochs=max_epochs, mini_batch_size = 32,
                   optimizer='Adam', optimizer_param={'lr': 0.001}
-                  #evaluate_sample_num_per_epoch=len(x_test)
                   )
 trainer.train()
 
@@ -51,9 +62,9 @@ plt.plot(x, trainer.train_acc_list, marker='o', label='train')
 plt.plot(x, trainer.test_acc_list, marker='o', label='test')
 plt.xlabel("epochs")
 plt.ylabel("accuracy")
-plt.ylim(0, 1.0)
+plt.ylim(0.5, 1.0)
 plt.legend(loc='lower right')
-plt.savefig("acuracy_Cov_1510.png")
+plt.savefig("accuracy_Cov_batch32.png")
 
 plt.clf()
 
@@ -63,4 +74,4 @@ plt.xlabel("epochs")
 plt.ylabel("loss")
 #plt.ylim(0, 2.0)
 plt.legend(loc='upper right')
-plt.savefig("loss_Cov_1510.png")
+plt.savefig("loss_Cov_batch32.png")

@@ -9,12 +9,21 @@ from collections import OrderedDict
 
 class TwoLayerNet:
 
-    def __init__(self, input_size, hidden_size, output_size, weight_init_std = 0.1):
+    def __init__(self, input_size, hidden_size, output_size, weight_init_std = 0.01):
+             
         # 重みの初期化
         self.params = {}
-        self.params['W1'] = weight_init_std * np.random.randn(input_size, hidden_size)
+        all_size_list = [input_size] + [hidden_size] + [output_size]
+
+        if weight_init_std == 'Relu':
+            scale = np.sqrt(2.0 / all_size_list[0])
+            self.params['W1'] = np.sqrt(2.0 / all_size_list[0]) * np.random.randn(input_size, hidden_size)
+            self.params['W2'] = np.sqrt(2.0 / all_size_list[1]) * np.random.randn(hidden_size, output_size)
+        else:
+            self.params['W1'] = weight_init_std * np.random.randn(input_size, hidden_size)
+            self.params['W2'] = weight_init_std * np.random.randn(hidden_size, output_size)
+        
         self.params['b1'] = np.zeros(hidden_size)
-        self.params['W2'] = weight_init_std * np.random.randn(hidden_size, output_size)
         self.params['b2'] = np.zeros(output_size)
         # レイヤの生成
         self.layers = OrderedDict()

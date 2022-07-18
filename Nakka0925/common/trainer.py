@@ -4,6 +4,7 @@ sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポ�
 import numpy as np
 from common.optimizer import *
 import time
+import math
 
 class Trainer:
     """ニューラルネットの訓練を行うクラス
@@ -16,8 +17,10 @@ class Trainer:
         self.verbose = verbose
         self.x_train = x_train
         self.t_train = t_train
-        self.x_test = x_test
-        self.t_test = t_test
+        self.x_test = x_test[:755]
+        self.t_test = t_test[:755]
+        self.x_val = x_test[755:]
+        self.t_val = t_test[755:]
         self.epochs = epochs
         self.batch_size = mini_batch_size
         self.evaluate_sample_num_per_epoch = evaluate_sample_num_per_epoch
@@ -28,7 +31,7 @@ class Trainer:
         self.optimizer = optimizer_class_dict[optimizer.lower()](**optimizer_param)
         
         self.train_size = x_train.shape[0]
-        self.iter_per_epoch = int(max(self.train_size / mini_batch_size, 1))
+        self.iter_per_epoch = math.ceil(max(self.train_size / mini_batch_size, 1))
         self.max_iter = int(epochs * self.iter_per_epoch)
         self.current_iter = 0
         self.current_epoch = 0
@@ -38,28 +41,29 @@ class Trainer:
         self.train_acc_list = []
         self.test_acc_list = []
 
-    def train_step(self):
-        batch_mask = np.random.choice(self.train_size, self.batch_size)
+    def train_step(self, low, high):
+        #batch_mask = np.random.choice(self.train_size, self.batch_size)
+        #print(self.x_train.shape[0])
         self.current_iter += 1
-        x_batch = self.x_train[batch_mask]
-        t_batch = self.t_train[batch_mask]
+        x_batch = self.x_train[low:high]
+        t_batch = self.t_train[low:high]
         
         grads = self.network.gradient(x_batch, t_batch)
         self.optimizer.update(self.network.params, grads)
         
-        loss = self.network.loss(x_batch, t_batch)
+        #loss = self.network.loss(x_batch, t_batch)
         #self.train_loss_list.append(loss)
-        if self.verbose: print("train loss:" + str(loss))
+        if self.verbose: print("train loss:" + str(high))
         
         if self.current_iter % self.iter_per_epoch == 0:
             self.current_epoch += 1
             
             x_train_sample, t_train_sample = self.x_train, self.t_train
-            x_test_sample, t_test_sample = self.x_test, self.t_test
+            x_test_sample, t_test_sample = self.x_val, self.t_val
             if not self.evaluate_sample_num_per_epoch is None:
                 t = self.evaluate_sample_num_per_epoch
                 x_train_sample, t_train_sample = self.x_train[:t], self.t_train[:t]
-                x_test_sample, t_test_sample = self.x_test[:t], self.t_test[:t]
+                x_test_sample, t_test_sample = self.x_val[:t], self.t_val[:t]
             
             train_acc = self.network.accuracy(x_train_sample, t_train_sample)
             test_acc = self.network.accuracy(x_test_sample, t_test_sample)
@@ -79,8 +83,18 @@ class Trainer:
     def train(self):
         #start = time.time()
         #print(self.max_iter)
-        for i in range(self.max_iter):
-            self.train_step()
+        low = 0
+        high = self.batch_size
+        for i in range(1, self.max_iter+1):
+            self.train_step(low, high)
+            low = high
+            high += self.batch_size
+
+            if (i+1) % self.iter_per_epoch == 0: 
+                high = self.train_size 
+            if i % self.iter_per_epoch == 0:
+                low = 0
+                high = self.batch_size
 
         test_acc = self.network.accuracy(self.x_test, self.t_test)
 

@@ -29,7 +29,7 @@ t_train = np.array(t_train)
 x_test = np.array(x_test)
 t_test = np.array(t_test)
 
-network = TwoLayerNet(input_size=36864, hidden_size=50, output_size=3)
+network = TwoLayerNet(input_size=36864, hidden_size=50, output_size=3, weight_init_std = 'Relu')
 
 train_size = x_train.shape[0]
 batch_size = 100
@@ -88,7 +88,7 @@ plt.xlabel("epochs")
 plt.ylabel("accuracy")
 plt.ylim(0, 1.0)
 plt.legend(loc='lower right')
-plt.savefig("accuracy_batch.png")
+plt.savefig("accuracy_batch_He.png")
 
 plt.clf()
 
@@ -99,4 +99,4 @@ plt.plot(x, test_loss_list, marker="o", label='test loss',)
 plt.xlabel("epochs")
 plt.ylabel("loss")
 plt.legend(loc='upper right')
-plt.savefig("loss_batch.png")
+plt.savefig("loss_batch_He.png")
