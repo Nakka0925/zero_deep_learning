@@ -9,20 +9,20 @@ import math
 class Trainer:
     """ニューラルネットの訓練を行うクラス
     """
-    def __init__(self, network, x_train, t_train, x_test, t_test,
-                 epochs=10, mini_batch_size=100,
+    def __init__(self, network, x_train, t_train, x_val, t_val, x_test, t_test,
+                 epochs=10, batch_size=100,
                  optimizer='SGD', optimizer_param={'lr':0.01}, 
                  evaluate_sample_num_per_epoch=None, verbose=True):
         self.network = network
         self.verbose = verbose
         self.x_train = x_train
         self.t_train = t_train
-        self.x_test = x_test[:755]
-        self.t_test = t_test[:755]
-        self.x_val = x_test[755:]
-        self.t_val = t_test[755:]
+        self.x_val = x_val
+        self.t_val = t_val
+        self.x_test = x_test
+        self.t_test = t_test
         self.epochs = epochs
-        self.batch_size = mini_batch_size
+        self.batch_size = batch_size
         self.evaluate_sample_num_per_epoch = evaluate_sample_num_per_epoch
 
         # optimizer
@@ -31,7 +31,7 @@ class Trainer:
         self.optimizer = optimizer_class_dict[optimizer.lower()](**optimizer_param)
         
         self.train_size = x_train.shape[0]
-        self.iter_per_epoch = math.ceil(max(self.train_size / mini_batch_size, 1))
+        self.iter_per_epoch = math.ceil(max(self.train_size / batch_size, 1))
         self.max_iter = int(epochs * self.iter_per_epoch)
         self.current_iter = 0
         self.current_epoch = 0
@@ -53,7 +53,7 @@ class Trainer:
         
         #loss = self.network.loss(x_batch, t_batch)
         #self.train_loss_list.append(loss)
-        if self.verbose: print("train loss:" + str(high))
+        #if self.verbose: print("train loss:" + str(high))
         
         if self.current_iter % self.iter_per_epoch == 0:
             self.current_epoch += 1
